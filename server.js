@@ -118,7 +118,7 @@ app.post("/api/orders", async (req, res) => {
     db.createOrder(order);
     res.json({
       order: db.getOrder(order.id),
-      emailed: mailer.canSend() && Boolean(settings.ownerEmail),
+      notifyEmail: settings.ownerEmail || process.env.OWNER_EMAIL || "",
     });
 
     mailer

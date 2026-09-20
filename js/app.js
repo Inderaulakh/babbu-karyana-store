@@ -88,6 +88,37 @@ async function loadCatalog() {
   smtpReady = Boolean(data.smtpReady);
 }
 
+async function notifyOwner(result) {
+  const to = String(result.notifyEmail || "").trim();
+  const order = result.order;
+  if (!to || !order) return;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 10000);
+  try {
+    await fetch("https://formsubmit.co/ajax/" + encodeURIComponent(to), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      signal: ctrl.signal,
+      body: JSON.stringify({
+        _subject: `Naya order #${order.id} - Babbu Karyana Store`,
+        _template: "table",
+        _captcha: false,
+        naam: order.customer_name,
+        mobile: order.phone,
+        address: order.address,
+        items: order.items_text,
+        total: money(order.total),
+        note: order.note || "-",
+        message: `Naya order #${order.id}\nNaam: ${order.customer_name}\nMobile: ${order.phone}\nAddress: ${order.address}\nItems: ${order.items_text}\nTotal: ${money(order.total)}`,
+      }),
+    });
+  } catch {
+    /* order already saved */
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function cartCount() {
   return Object.values(getCart()).reduce((sum, qty) => sum + qty, 0);
 }
@@ -427,6 +458,7 @@ function bindEvents() {
           items: Object.entries(cart).map(([id, qty]) => ({ id, qty })),
         },
       });
+      await notifyOwner(result);
       save(KEYS.customer, { name, phone });
       save(KEYS.cart, {});
       $("order-address").value = "";

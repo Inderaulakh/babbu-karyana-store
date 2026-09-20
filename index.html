@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Babbu Karyana Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div id="file-warning" class="login-wrap app-hidden">
+    <div class="login-card">
+      <h2>Website server se kholo</h2>
+      <p class="sub">Ab ye poori working website hai. File pe double-click mat karo. Folder mein <strong>start.bat</strong> chalao, phir browser mein <strong>http://localhost:3000</strong> kholo.</p>
+    </div>
+  </div>
+
+  <div id="screen-login" class="login-wrap">
+    <div class="login-card">
+      <div class="brand" style="margin-bottom:18px">
+        <div class="logo-mark">BK</div>
+        <div>
+          <h1>Babbu Karyana Store</h1>
+          <p>Village grocery, ghar tak delivery</p>
+        </div>
+      </div>
+      <div class="login-kicker">WELCOME</div>
+      <h2>Apna naam aur number daaliye</h2>
+      <p class="sub">Saman choose karo, cart mein daalo, address likho aur order kar do. Dukaan wale aapko call karke confirm karenge.</p>
+      <form id="login-form">
+        <div class="field">
+          <label for="customer-name">Aapka naam</label>
+          <input id="customer-name" name="name" placeholder="Jaise: Gurpreet Singh" required />
+        </div>
+        <div class="field">
+          <label for="customer-phone">Mobile number</label>
+          <input id="customer-phone" name="phone" inputmode="numeric" maxlength="10" placeholder="10 digit mobile number" required />
+        </div>
+        <button class="primary" type="submit">Shopping shuru karein</button>
+      </form>
+      <button class="ghost" id="open-admin" type="button">Dukaan wale / Admin login</button>
+    </div>
+  </div>
+
+  <div id="screen-shop" class="app-hidden">
+    <header class="topbar">
+      <div class="topbar-row">
+        <div class="brand">
+          <div class="logo-mark">BK</div>
+          <div>
+            <h1>Babbu Karyana Store</h1>
+            <p id="delivery-line">20-30 min mein delivery</p>
+          </div>
+        </div>
+        <div class="search-wrap">
+          <span>🔎</span>
+          <input id="search" placeholder="Atta, tel, namak search karein" />
+        </div>
+        <div class="user-chip" id="user-chip"></div>
+        <button class="cart-btn" id="header-cart" type="button">🛒 Cart <span class="badge app-hidden" id="header-badge">0</span></button>
+      </div>
+    </header>
+    <main class="page">
+      <section class="hero-strip">
+        <div>
+          <h2>Aaj kya lena hai?</h2>
+          <p>Ration, masale, namkeen aur ghar ka saman — add to cart karke order kar do.</p>
+        </div>
+        <div class="pill" id="hero-pill">Free delivery ₹299+</div>
+      </section>
+      <div class="cats" id="cats"></div>
+      <div class="grid" id="product-grid"></div>
+      <button class="float-cart app-hidden" id="float-cart" type="button"></button>
+    </main>
+  </div>
+
+  <div id="screen-cart" class="app-hidden">
+    <header class="topbar">
+      <div class="topbar-row">
+        <div class="brand">
+          <div class="logo-mark">BK</div>
+          <div>
+            <h1>Aapka cart</h1>
+            <p>Checkout se pehle address daal dena</p>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="page">
+      <button class="back-link" id="back-shop" type="button">← Shopping continue karein</button>
+      <div class="cart-layout">
+        <section class="panel">
+          <h2>Items</h2>
+          <div id="cart-items"></div>
+        </section>
+        <aside class="panel">
+          <h2>Order confirm karein</h2>
+          <form id="checkout-form">
+            <div class="two-col">
+              <div class="field">
+                <label for="order-name">Naam</label>
+                <input id="order-name" required />
+              </div>
+              <div class="field">
+                <label for="order-phone">Mobile</label>
+                <input id="order-phone" required maxlength="10" />
+              </div>
+            </div>
+            <div class="field">
+              <label for="order-address">Ghar ka address / village</label>
+              <textarea id="order-address" rows="3" placeholder="Gali, pind, landmark" required></textarea>
+            </div>
+            <div class="field">
+              <label for="order-note">Note (optional)</label>
+              <input id="order-note" placeholder="Jaise: shaam 6 baje ke baad dena" />
+            </div>
+            <div id="bill"></div>
+            <button class="primary" id="buy-btn" type="submit">Buy now / Order kar do</button>
+            <p class="hint">Order aate hi dukaan wale ko mail chali jaayegi. Woh aapko call karke confirm karenge aur saman ghar pahuncha denge.</p>
+          </form>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <div id="screen-success" class="app-hidden">
+    <main class="page">
+      <section class="panel success-box">
+        <div class="big">✅</div>
+        <h2>Order aa gaya!</h2>
+        <p class="sub" id="success-text"></p>
+        <p id="success-meta" style="margin:12px 0 18px;color:#6b7280"></p>
+        <button class="primary" id="shop-again" type="button">Naya order karein</button>
+        <button class="ghost" id="logout-btn" type="button">Logout</button>
+      </section>
+    </main>
+  </div>
+
+  <div id="screen-admin-login" class="login-wrap app-hidden">
+    <div class="login-card">
+      <div class="login-kicker">ADMIN</div>
+      <h2>Dukaan wale ka panel</h2>
+      <p class="sub">Yahan se products add/remove karo, orders dekho, aur apna email set karo.</p>
+      <form id="admin-login-form">
+        <div class="field">
+          <label for="admin-pin">PIN</label>
+          <input id="admin-pin" type="password" placeholder="Apna admin PIN" required />
+        </div>
+        <button class="primary" type="submit">Admin dashboard kholo</button>
+      </form>
+      <button class="ghost" id="back-login" type="button">Customer login pe jao</button>
+    </div>
+  </div>
+
+  <div id="screen-admin" class="app-hidden">
+    <header class="topbar">
+      <div class="topbar-row">
+        <div class="brand">
+          <div class="logo-mark">BK</div>
+          <div>
+            <h1>Admin dashboard</h1>
+            <p>Products, orders, notifications</p>
+          </div>
+        </div>
+        <button class="logout-text" id="admin-logout" type="button">Logout</button>
+      </div>
+    </header>
+    <main class="page">
+      <div class="stats" id="admin-stats"></div>
+      <div class="admin-tabs">
+        <button class="active" data-tab="products" type="button">Products</button>
+        <button data-tab="orders" type="button">Orders <span id="order-count"></span></button>
+        <button data-tab="settings" type="button">Email / Settings</button>
+      </div>
+
+      <section id="tab-products" class="admin-layout">
+        <form class="panel" id="add-product-form">
+          <h2 id="product-form-title">Naya product add karo</h2>
+          <input type="hidden" id="p-id" />
+          <div class="field">
+            <label for="p-name">Product name</label>
+            <input id="p-name" placeholder="Jaise: Tata Salt" required />
+          </div>
+          <div class="two-col">
+            <div class="field">
+              <label for="p-category">Category</label>
+              <select id="p-category"></select>
+            </div>
+            <div class="field">
+              <label for="p-unit">Unit / size</label>
+              <input id="p-unit" placeholder="1 kg" required />
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="field">
+              <label for="p-price">Selling price</label>
+              <input id="p-price" type="number" min="1" required />
+            </div>
+            <div class="field">
+              <label for="p-mrp">MRP</label>
+              <input id="p-mrp" type="number" min="1" required />
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="field">
+              <label for="p-emoji">Emoji / icon</label>
+              <input id="p-emoji" value="🛒" />
+            </div>
+            <div class="field">
+              <label for="p-tag">Tag (optional)</label>
+              <input id="p-tag" placeholder="Bestseller" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="p-image">Photo URL (optional)</label>
+            <input id="p-image" placeholder="https://..." />
+          </div>
+          <button class="primary" id="product-save-btn" type="submit">Product add karo</button>
+          <button class="ghost app-hidden" id="product-cancel" type="button">Cancel edit</button>
+        </form>
+        <div class="panel">
+          <h2>Current products</h2>
+          <div id="admin-products"></div>
+        </div>
+      </section>
+
+      <section id="tab-orders" class="app-hidden">
+        <div class="panel">
+          <h2>Aaye hue orders</h2>
+          <p class="hint">Customer buy karega toh yahan list aa jaayegi. Call karke confirm karo, phir delivered mark kar do.</p>
+          <div class="order-list" id="admin-orders"></div>
+        </div>
+      </section>
+
+      <section id="tab-settings" class="app-hidden">
+        <form class="panel" id="settings-form" style="max-width:560px">
+          <h2>Notification settings</h2>
+          <p class="hint" style="margin-bottom:14px">Apna Gmail yahan daalo. Email actually jaane ke liye <code>.env</code> mein SMTP_USER aur Gmail App Password bhi set karna hoga.</p>
+          <div class="field">
+            <label for="s-email">Aapka email (order yahan aayega)</label>
+            <input id="s-email" type="email" placeholder="babbu@gmail.com" />
+          </div>
+          <div class="field">
+            <label for="s-phone">WhatsApp / mobile (10 digit)</label>
+            <input id="s-phone" maxlength="10" placeholder="98XXXXXXXX" />
+          </div>
+          <div class="two-col">
+            <div class="field">
+              <label for="s-free">Free delivery above ₹</label>
+              <input id="s-free" type="number" min="0" />
+            </div>
+            <div class="field">
+              <label for="s-fee">Delivery fee ₹</label>
+              <input id="s-fee" type="number" min="0" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="s-mins">Delivery time</label>
+            <input id="s-mins" placeholder="20-30" />
+          </div>
+          <div class="field">
+            <label for="s-pin">Naya admin PIN (blank = same)</label>
+            <input id="s-pin" placeholder="Change karna ho toh yahan" />
+          </div>
+          <p class="hint" id="smtp-status"></p>
+          <button class="primary" type="submit">Settings save karo</button>
+          <button class="ghost" id="test-email" type="button">Test email bhejo</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="/js/config.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

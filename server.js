@@ -116,17 +116,18 @@ app.post("/api/orders", async (req, res) => {
     };
 
     db.createOrder(order);
-    const mail = await mailer.sendOrderEmail(settings.ownerEmail, order).catch((err) => ({
-      sent: false,
-      reason: err.message,
-    }));
-    if (mail.sent) db.markEmailSent(order.id);
-
     res.json({
       order: db.getOrder(order.id),
-      emailed: Boolean(mail.sent),
-      mailReason: mail.reason || "",
+      emailed: mailer.canSend() && Boolean(settings.ownerEmail),
     });
+
+    mailer
+      .sendOrderEmail(settings.ownerEmail, order)
+      .then((mail) => {
+        if (mail.sent) db.markEmailSent(order.id);
+        else console.log("Order email skip", order.id, mail.reason || "");
+      })
+      .catch((err) => console.error("Order email fail", order.id, err.message));
   } catch (err) {
     res.status(500).json({ error: err.message || "Order save nahi hua" });
   }

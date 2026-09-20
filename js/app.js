@@ -60,15 +60,25 @@ function showScreen(id) {
 }
 
 async function api(path, opts = {}) {
-  const res = await fetch(path, {
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
-    method: opts.method || "GET",
-    body: opts.body ? JSON.stringify(opts.body) : undefined,
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || "Request fail ho gayi");
-  return data;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), opts.timeoutMs || 20000);
+  try {
+    const res = await fetch(path, {
+      credentials: "include",
+      headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
+      method: opts.method || "GET",
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      signal: ctrl.signal,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "Request fail ho gayi");
+    return data;
+  } catch (err) {
+    if (err.name === "AbortError") throw new Error("Server slow hai, dobara try karo");
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function loadCatalog() {
@@ -423,9 +433,7 @@ function bindEvents() {
       $("order-note").value = "";
       $("success-text").textContent =
         "Dukaan wale ko order mil gaya hai. Woh aapko call karke confirm karenge aur saman ghar pahuncha denge.";
-      $("success-meta").textContent = result.emailed
-        ? `Order #${result.order.id} · ${money(result.order.total)} · Email bhej di gayi`
-        : `Order #${result.order.id} · ${money(result.order.total)} · Admin dashboard pe save ho gaya${result.mailReason ? " (" + result.mailReason + ")" : ""}`;
+      $("success-meta").textContent = `Order #${result.order.id} · ${money(result.order.total)}`;
       showScreen("screen-success");
     } catch (err) {
       toast(err.message);

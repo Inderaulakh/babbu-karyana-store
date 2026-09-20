@@ -14,7 +14,14 @@ function canSend() {
 
 function transporter() {
   return nodemailer.createTransport({
-    service: "gmail",
+    host: process.env.SMTP_HOST || "smtp.gmail.com",
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: false,
+    requireTLS: true,
+    family: 4,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
     auth: {
       user: process.env.SMTP_USER,
       pass: smtpPass(),
@@ -41,12 +48,13 @@ async function sendOrderEmail(to, order) {
   if (!to) return { sent: false, reason: "Owner email set nahi hai" };
   if (!canSend()) return { sent: false, reason: "SMTP .env mein set nahi hai" };
 
-  await transporter().sendMail({
-    from: `"Babbu Karyana Store" <${process.env.SMTP_USER}>`,
-    to,
-    subject: `Naya order #${order.id} - Babbu Karyana Store`,
-    text: orderText(order),
-    html: `
+  try {
+    await transporter().sendMail({
+      from: `"Babbu Karyana Store" <${process.env.SMTP_USER}>`,
+      to,
+      subject: `Naya order #${order.id} - Babbu Karyana Store`,
+      text: orderText(order),
+      html: `
       <div style="font-family:Arial,sans-serif;max-width:560px">
         <h2>Naya order #${order.id}</h2>
         <p><b>Naam:</b> ${order.customer_name}<br/>
@@ -58,8 +66,12 @@ async function sendOrderEmail(to, order) {
         <p>Customer ko call karke confirm karo aur saman ghar pahuncha do.</p>
       </div>
     `,
-  });
-  return { sent: true };
+    });
+    return { sent: true };
+  } catch (err) {
+    console.error("Order email fail:", err.message);
+    return { sent: false, reason: err.message };
+  }
 }
 
 async function sendTestEmail(to) {
